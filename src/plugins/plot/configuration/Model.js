@@ -89,8 +89,6 @@ export default class Model extends EventEmitter {
     this.removeAllListeners();
   }
 
-
-
   /**
    * @template {keyof ModelType<T>} K
    * @param {K} attribute
