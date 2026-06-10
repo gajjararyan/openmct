@@ -328,7 +328,20 @@ export default class TableRowCollection extends EventEmitter {
 
   setColumnRegexFilter(columnKey, filter) {
     filter = filter.trim();
-    this.columnFilters[columnKey] = new RegExp(filter);
+    try {
+      const regex = new RegExp(filter);
+      // Test with a short string first to detect backtracking
+      const testStart = performance.now();
+      regex.test('a'.repeat(20));
+      if (performance.now() - testStart > 100) {
+        console.warn('Regex too complex, skipping filter');
+        return;
+      }
+      this.columnFilters[columnKey] = regex;
+    } catch (e) {
+      // Invalid regex — ignore
+      return;
+    }
 
     this.emit('resetRowsFromAllData');
   }

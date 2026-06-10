@@ -331,7 +331,18 @@ export default function installWorker() {
       return this.#currentBufferLength > 0;
     }
     setThrottleMessagePattern(priorityMessagePattern) {
-      this.#throttleMessagePattern = new RegExp(priorityMessagePattern, 'm');
+      try {
+        const regex = new RegExp(priorityMessagePattern, 'm');
+        const testStart = performance.now();
+        regex.test('a'.repeat(20));
+        if (performance.now() - testStart > 100) {
+          console.warn('Regex too complex, skipping pattern');
+          return;
+        }
+        this.#throttleMessagePattern = regex;
+      } catch (e) {
+        return;
+      }
     }
   }
 
